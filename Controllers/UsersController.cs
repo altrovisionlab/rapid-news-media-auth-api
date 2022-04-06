@@ -1,38 +1,54 @@
 #nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using rapid_news_media_auth_api.Models;
+using rapid_news_media_auth_api.Authorization;
+using rapid_news_media_auth_api.Services;
 
 namespace rapid_news_media_auth_api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly AuthDBContext _context;
 
-        public UsersController(AuthDBContext context)
+        private IAuthService _authService;
+
+        private IUserService _userService;
+
+        public UsersController(IAuthService authService, IUserService userService)
         {
-            _context = context;
+            _authService = authService;
+
+            _userService = userService;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Authenticate([FromBody] AuthUser authUser)
+        {
+            var user = await _authService.Login(authUser.Username, authUser.Password);
+
+            if (user == null)
+                return BadRequest(new { message = "Username or password is incorrect" });
+
+            return Ok(user);
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<List<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            //return await _context.Users.ToListAsync();
+            return await _userService.GetAll();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(long id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetById(id);
 
             if (user == null)
             {
@@ -52,22 +68,17 @@ namespace rapid_news_media_auth_api.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+                var updatedUser = await _userService.Update(user);
+                if (updatedUser == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
 
             return NoContent();
@@ -75,11 +86,12 @@ namespace rapid_news_media_auth_api.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+
+            var createdUser = await _userService.Create(user);
 
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
@@ -88,21 +100,16 @@ namespace rapid_news_media_auth_api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(long id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetById(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            await _userService.Delete(user);
 
             return NoContent();
         }
 
-        private bool UserExists(long id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
     }
 }
