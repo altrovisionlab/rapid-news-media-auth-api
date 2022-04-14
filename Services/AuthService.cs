@@ -20,7 +20,9 @@ public class AuthService : IAuthService
     // users hardcoded for simplicity, store in a db with hashed passwords in production applications
     private List<User> _users = new List<User>
     {
-        new User { Id = 1, Firstname = "Sergiu", Lastname = "Dobrovolschi", Username = "test", Password = "test", AuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI" }
+        new User { Id = 1, Firstname = "John", Lastname = "Smith", Username = "john", Password = "test", AuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI" },
+        new User { Id = 1, Firstname = "Erika", Lastname = "Mullen", Username = "erika", Password = "test", AuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI" },
+        new User { Id = 1, Firstname = "Jessica", Lastname = "Luarez", Username = "jessica", Password = "test", AuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI" }
     };
 
     public async Task<User> Login(string username, string password)

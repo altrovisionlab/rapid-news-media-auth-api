@@ -28,7 +28,19 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+
+    //Initialize Seed for In Memory Database 
+    var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+    using (var scope = scopeFactory.CreateScope())
+    {
+        var dbcontext = scope.ServiceProvider.GetRequiredService<AuthDBContext>();
+        dbcontext.Database.EnsureCreated();
+    }
+
 }
+
+
 
 app.UseHttpsRedirection();
 
