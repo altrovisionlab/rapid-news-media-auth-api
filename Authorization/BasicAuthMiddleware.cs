@@ -18,13 +18,28 @@ public class BasicAuthMiddleware
         try
         {
             var authHeader = AuthenticationHeaderValue.Parse(context.Request.Headers["Authorization"]);
-            var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
-            var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
-            var username = credentials[0];
-            var password = credentials[1];
 
-            // authenticate credentials with user service and attach user to http context
-            context.Items["User"] = await authService.Login(username, password);
+            //Basic Authentication
+            if (authHeader.Scheme.Equals("Basic"))
+            {
+                var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
+                var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
+                var username = credentials[0];
+                var password = credentials[1];
+
+                // authenticate credentials with user service and attach user to http context
+                context.Items["User"] = await authService.Login(username, password);
+            }
+            //OAuth authorization with JWT token 
+            else if(authHeader.Scheme.Equals("Bearer"))
+            {
+                var tokenJWT = authHeader.Parameter;
+                
+
+                // validate JWT token with user service and attach user to http context
+                context.Items["User"] = await authService.Validate(tokenJWT);
+            }
+
         }
         catch
         {

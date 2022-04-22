@@ -50,7 +50,7 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader());
 
-// custom basic auth middleware
+// custom auth middleware
 app.UseMiddleware<BasicAuthMiddleware>();
 
 app.UseAuthorization();

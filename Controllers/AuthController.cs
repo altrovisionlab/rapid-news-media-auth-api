@@ -30,5 +30,12 @@ namespace rapid_news_media_auth_api.Controllers
 
             return Ok(user);
         }
+
+        [HttpGet("validate")]
+        public async Task<IActionResult> Validate()
+        {
+            //Return 200 OK if the Authorazione header containing the JWT was successfully validated. See BasicAuthMiddleware
+            return Ok();
+        }
     }
 }
